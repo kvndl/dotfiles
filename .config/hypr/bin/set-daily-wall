@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+# Directory to store downloaded wallpapers
+WALLPAPER_DIR="$HOME/Pictures/Wallpapers"
+
+# Ensure the directory exists
+mkdir -p "$WALLPAPER_DIR"
+
+# Fetch the daily wallpaper URL (example: Bing daily wallpaper)
+WALLPAPER_URL=$(curl -s "https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1" | jq -r '.images[0].url')
+
+# Check if the URL was fetched correctly
+if [ -z "$WALLPAPER_URL" ]; then
+    echo "Failed to retrieve wallpaper URL."
+    exit 1
+fi
+
+# Full URL - Ensure it's properly quoted to handle special characters
+FULL_URL="https://www.bing.com${WALLPAPER_URL}"
+
+# Download the wallpaper
+WALLPAPER_PATH="$WALLPAPER_DIR/$(date +%Y-%m-%d).jpg"
+curl -o "$WALLPAPER_PATH" "$FULL_URL"
+
+# Set the wallpaper using swww
+swww img "$WALLPAPER_PATH"

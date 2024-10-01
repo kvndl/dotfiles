@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+# Configuration
+API_KEY="f418c876ece80620b23dd6c7906563a3"
+LAT="35.084385"
+LON="-106.650421"
+UNITS="imperial"
+SYMBOL="°F"
+
+# Fetch weather data
+WEATHER=$(curl -s "http://api.openweathermap.org/data/2.5/weather?lat=${LAT}&lon=${LON}&appid=${API_KEY}&units=${UNITS}")
+
+# Parse JSON response
+TEMP=$(echo $WEATHER | jq ".main.feels_like" | xargs printf "%.0f")
+
+# Output for Waybar
+echo "${TEMP}${SYMBOL}"

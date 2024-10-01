@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+# Function to enable Wayland compatibility
+enable_wayland() {
+    local APP_ID=$1
+    flatpak override --user --socket=wayland $APP_ID
+    flatpak override --user --env=OZONE_PLATFORM_HINT=auto $APP_ID
+    flatpak override --user --env=ENABLE_FEATURES=WaylandWindowDecorations $APP_ID
+    echo "Wayland compatibility enabled for $APP_ID"
+}
+
+# Function to undo Wayland compatibility
+undo_wayland() {
+    local APP_ID=$1
+    flatpak override --user --reset $APP_ID
+    echo "Wayland compatibility undone for $APP_ID"
+}
+
+# Check if an application ID is provided
+if [ -z "$2" ]; then
+    echo "Usage: $0 <enable|undo> <flatpak-app-id>"
+    exit 1
+fi
+
+ACTION=$1
+APP_ID=$2
+
+case $ACTION in
+    enable)
+        enable_wayland $APP_ID
+        ;;
+    undo)
+        undo_wayland $APP_ID
+        ;;
+    *)
+        echo "Invalid action. Use 'enable' or 'undo'."
+        exit 1
+        ;;
+esac

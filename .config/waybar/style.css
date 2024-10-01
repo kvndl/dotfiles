@@ -1,0 +1,86 @@
+@import "mocha.css";
+
+* {
+    font-family: FantasqueSansMono Nerd Font;
+    font-size: 17px;
+    min-height: 0;
+}
+
+tooltip {
+    font-size: 16px;
+}
+
+#waybar {
+    background: transparent;
+    color: @text;
+    margin: 5px 5px;
+}
+
+#workspaces {
+    border-radius: 1rem;
+    margin: 5px;
+    background-color: @surface0;
+    margin-left: 1rem;
+}
+
+#workspaces button {
+    color: @lavender;
+    border-radius: 1rem;
+    padding: 0.4rem;
+}
+
+#workspaces button.active {
+    color: @sky;
+    border-radius: 1rem;
+}
+
+#workspaces button:hover {
+    color: @sapphire;
+    border-radius: 1rem;
+}
+
+#custom-music,
+#tray,
+#clock,
+#wireplumber,
+#keyboard-state,
+#cpu,
+#memory,
+#custom-date,
+#custom-weather {
+    background-color: @surface0;
+    padding: 0.5rem 1rem;
+    margin: 5px 0;
+}
+
+#clock,
+#custom-date,
+#custom-weather {
+    color: @text;
+    margin-right: 0.5rem;
+    margin-left: 0.5rem;
+    border-radius: 1rem;
+}
+
+#cpu,
+#memory {
+    color: @text;
+    margin-right: 0.5rem;
+    border-radius: 1rem;
+}
+
+#wireplumber {
+    color: @maroon;
+    margin-right: 0.5rem;
+    border-radius: 1rem;
+}
+
+#custom-music {
+    color: @mauve;
+    border-radius: 1rem;
+}
+
+#tray {
+    margin-right: 0.5rem;
+    border-radius: 1rem;
+}

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Get the current monitor
+current_monitor=$(hyprctl monitors -j | jq -r '.[] | select(.focused).name')
+
+# Get the highest workspace number and increment it by 1
+next_workspace=$(hyprctl workspaces -j | jq '[.[] | .id] | max + 1')
+
+# Create and switch to the new workspace on the current monitor
+hyprctl dispatch workspace "$next_workspace"
+hyprctl dispatch moveworkspacetomonitor "$next_workspace $current_monitor"

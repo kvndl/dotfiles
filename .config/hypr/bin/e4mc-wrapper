@@ -1,0 +1,57 @@
+#!/bin/bash
+
+BOT_LOG_FILE="/tmp/discord_bot.log"
+BOT_PID_FILE="/tmp/discord_bot.pid"
+DISCORD_BOT_SCRIPT="/home/knoodle/.config/hypr/bin/e4mc-bot.py"
+
+# Check if python3 is available
+if ! command -v python3 &>/dev/null; then
+    echo "Python3 is not installed or not found in PATH."
+    exit 1
+fi
+
+# Function to start the Discord bot script in the background
+start_discord_bot() {
+    if [ -z "$INST_DIR" ]; then
+        echo "INST_DIR environment variable is not set."
+        exit 1
+    fi
+
+    echo "Starting Discord bot..."
+    echo "Instance Directory: $INST_DIR"
+    LOG_FILE_PATH="$INST_DIR/.minecraft/logs/latest.log"
+
+    if [ ! -f "$DISCORD_BOT_SCRIPT" ]; then
+        echo "Discord bot script not found at $DISCORD_BOT_SCRIPT."
+        exit 1
+    fi
+
+    nohup python3 "$DISCORD_BOT_SCRIPT" "$LOG_FILE_PATH" > "$BOT_LOG_FILE" 2>&1 &
+    echo $! > "$BOT_PID_FILE"
+    echo "Discord bot started with PID $(cat $BOT_PID_FILE)"
+}
+
+# Function to stop the Discord bot script
+stop_discord_bot() {
+    if [ -f "$BOT_PID_FILE" ]; then
+        echo "Stopping Discord bot..."
+        kill "$(cat "$BOT_PID_FILE")" && rm "$BOT_PID_FILE"
+        echo "Discord bot stopped."
+    else
+        echo "No PID file found. Discord bot may not be running."
+    fi
+}
+
+# Main control flow
+case "$1" in
+    start)
+        start_discord_bot
+        ;;
+    stop)
+        stop_discord_bot
+        ;;
+    *)
+        echo "Usage: $0 {start|stop}"
+        exit 1
+        ;;
+esac

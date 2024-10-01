@@ -1,0 +1,108 @@
+{
+    "layer": "top",
+    "position": "top",
+    "modules-left":
+    [
+        "hyprland/workspaces",
+        "custom/music"
+    ],
+    "modules-center":
+    [
+        "clock",
+        "custom/date",
+        "custom/weather"
+    ],
+    "modules-right":
+    [
+        "cpu",
+        "memory",
+        "wireplumber",
+        "tray"
+    ],
+    "hyprland/workspaces":
+    {
+        "disable-scroll": true,
+        "sort-by-name": true,
+        "format-icons":
+        {
+            "default": ""
+        }
+    },
+    "tray":
+    {
+        "icon-size": 21,
+        "spacing": 10
+    },
+    "cpu":
+    {
+        "interval": 8,
+        "format": " {usage}%"
+    },
+    "memory":
+    {
+        "interval": 8,
+        "format": " {}%",
+    },
+    "custom/music":
+    {
+        "format": "{}",
+        "escape": true,
+        "interval": 5,
+        "tooltip": false,
+        "exec": "playerctl metadata --format='{{ title }} - {{ artist }}'",
+        "on-click": "playerctl play-pause",
+        "max-length": 50
+    },
+    "custom/date":
+    {
+        "format": "{}",
+        "exec": "date '+%A, %B %d'",
+        "interval": 3600,
+        "tooltip": false
+    },
+    "custom/weather": {
+        "exec": "/home/knoodle/.config/hypr/bin/weather.py",
+        "interval": 300,
+        "return-type": "json"
+    },
+    "clock":
+    {
+        "timezone": "America/Denver",
+        "tooltip-format": "<tt><small>{calendar}</small></tt>",
+        "format-alt": " {:%m/%d/%Y}",
+        "tooltip": true,
+        "format": "{:%H:%M}",
+        "actions":
+        {
+            "on-click-right": "mode"
+        },
+        "calendar":
+        {
+            "mode": "year",
+            "mode-mon-col": 3,
+            "format":
+            {
+                "months": "<span color='#ffead3'><b>{}</b></span>",
+                "days": "<span color='#ecc6d9'><b>{}</b></span>",
+                "weeks": "<span color='#99ffdd'><b>W{}</b></span>",
+                "weekdays": "<span color='#ffcc66'><b>{}</b></span>",
+                "today": "<span color='#ff6699'><b><u>{}</u></b></span>"
+            }
+        }
+    },
+    "wireplumber":
+    {
+        "format": "{icon}",
+        "format-muted": "",
+        "format-icons":
+        {
+            "default":
+            [
+                "",
+                "",
+                " "
+            ]
+        },
+        "on-click": "pavucontrol"
+    }
+}

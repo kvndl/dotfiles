@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+# Directory containing your video files
+VIDEO_DIR=~/Videos/loop
+
+# Path for the playlist file
+PLAYLIST_FILE=~/Videos/loopy.m3u
+
+# Expand the tilde to the full path
+VIDEO_DIR=$(realpath "$VIDEO_DIR")
+PLAYLIST_FILE=$(realpath "$PLAYLIST_FILE")
+
+# Find all video files in the directory and store them in an array
+video_files=("$VIDEO_DIR"/*)
+
+# Check if the array is empty
+if [ ${#video_files[@]} -eq 0 ]; then
+  echo "No video files found in $VIDEO_DIR"
+  exit 1
+fi
+
+# Write the paths of all video files to the playlist file
+for video in "${video_files[@]}"; do
+  echo "$video" >> "$PLAYLIST_FILE"
+done
+
+# Run VLC with the playlist file, loop option, and shuffle flag
+vlc --loop --random --playlist-autostart "$PLAYLIST_FILE"

@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+"""
+Streams audio from a YT URL or via live stream URL.
+
+Functions:
+    usage(): Displays usage information.
+    command_exists(cmd): Checks if a command exists.
+    check_prerequisites(): Checks if required commands are installed.
+    is_live_stream(url): Determines if the URL is a live stream.
+    stream_audio_from_video(url): Streams audio from a video URL using yt-dlp.
+    stream_live_stream(url): Streams video/audio from a live stream URL using streamlink.
+    main(): Main script logic.
+
+Usage:
+    Run the script with a video URL or live stream URL as a command-line argument.
+"""
+
+# Function to display usage information
+usage() {
+  echo "Usage: $0 <Video URL>"
+  echo "Streams audio from a video URL or video/audio from a live stream URL."
+  exit 1
+}
+
+# Function to check if a command exists
+command_exists() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+# Function to check prerequisites
+check_prerequisites() {
+  for cmd in mpv yt-dlp streamlink; do
+    if ! command_exists "$cmd"; then
+      echo "Error: $cmd is not installed. Please install it and try again."
+      exit 1
+    fi
+  done
+}
+
+# Function to determine if the URL is a live stream
+is_live_stream() {
+  local url="$1"
+  if [[ "$url" == *".m3u8"* ]] || [[ "$url" == *"twitch.tv"* ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+# Function to stream audio from a video URL using yt-dlp
+stream_audio_from_video() {
+  local url="$1"
+  echo "Extracting audio URL from: $url"
+  local audio_url
+  audio_url=$(yt-dlp -f bestaudio --get-url "$url" 2>/dev/null)
+
+  if [ -z "$audio_url" ]; then
+    echo "Error: Failed to extract audio URL. Please check the provided video URL."
+    exit 1
+  fi
+
+  echo "Starting audio stream from: $audio_url"
+  mpv --no-video "$audio_url"
+}
+
+# Function to stream video/audio from a live stream URL using streamlink
+stream_live_stream() {
+  local url="$1"
+  echo "Starting live stream from: $url"
+  streamlink --player mpv "$url" best
+}
+
+# Main script logic
+main() {
+  if [ -z "$1" ]; then
+    usage
+  fi
+
+  check_prerequisites
+
+  local url="$1"
+
+  if is_live_stream "$url"; then
+    stream_live_stream "$url"
+  else
+    stream_audio_from_video "$url"
+  fi
+
+  if [ $? -ne 0 ]; then
+    echo "Error: Failed to stream. Please check your network connection and try again."
+    exit 1
+  fi
+
+  echo "Streaming completed successfully."
+}
+
+# Run the main function
+main "$@"
