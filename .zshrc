@@ -7,7 +7,7 @@ export PATH
 
 plugins=(git)
 
-export EDITOR="codium"
+export EDITOR="nano"
 
 export GOPATH="$HOME/.go"
 export GOBIN="$HOME/.go/bin"
