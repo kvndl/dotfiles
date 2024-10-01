@@ -47,7 +47,8 @@ tooltip {
 #cpu,
 #memory,
 #custom-date,
-#custom-weather {
+#custom-weather,
+#keyboard-state {
     background-color: @surface0;
     padding: 0.5rem 1rem;
     margin: 5px 0;
@@ -63,7 +64,8 @@ tooltip {
 }
 
 #cpu,
-#memory {
+#memory,
+#keyboard-state {
     color: @text;
     margin-right: 0.5rem;
     border-radius: 1rem;

@@ -1,50 +1,54 @@
 {
     "layer": "top",
     "position": "top",
-    "modules-left":
-    [
+    "modules-left": [
         "hyprland/workspaces",
         "custom/music"
     ],
-    "modules-center":
-    [
+    "modules-center": [
         "clock",
         "custom/date",
         "custom/weather"
     ],
-    "modules-right":
-    [
+    "modules-right": [
+        "keyboard-state",
         "cpu",
         "memory",
         "wireplumber",
         "tray"
     ],
-    "hyprland/workspaces":
-    {
+    "hyprland/workspaces": {
         "disable-scroll": true,
         "sort-by-name": true,
-        "format-icons":
-        {
+        "format-icons": {
             "default": ""
         }
     },
-    "tray":
-    {
+    "tray": {
         "icon-size": 21,
         "spacing": 10
     },
-    "cpu":
-    {
+    "cpu": {
         "interval": 8,
-        "format": " {usage}%"
+        "format": "{usage} 🤜"
     },
-    "memory":
-    {
+    "memory": {
         "interval": 8,
-        "format": " {}%",
+        "format": "🤛 {}"
     },
-    "custom/music":
-    {
+    "keyboard-state": {
+        "numlock": true,
+        "capslock": true,
+        "format": {
+            "numlock": "NUM {icon}",
+            "capslock": "CAP {icon}  "
+        },
+        "format-icons": {
+            "locked": "🌕",
+            "unlocked": "🌑"
+        }
+    },
+    "custom/music": {
         "format": "{}",
         "escape": true,
         "interval": 5,
@@ -53,35 +57,32 @@
         "on-click": "playerctl play-pause",
         "max-length": 50
     },
-    "custom/date":
-    {
+    "custom/date": {
         "format": "{}",
         "exec": "date '+%A, %B %d'",
         "interval": 3600,
         "tooltip": false
     },
     "custom/weather": {
-        "exec": "/home/knoodle/.config/hypr/bin/weather.py",
-        "interval": 300,
+        "format": "{}°",
+        "tooltip": true,
+        "interval": 3600,
+        "exec": "~/.cargo/bin/wttrbar --fahrenheit --mph",
         "return-type": "json"
     },
-    "clock":
-    {
+    "clock": {
         "timezone": "America/Denver",
         "tooltip-format": "<tt><small>{calendar}</small></tt>",
         "format-alt": " {:%m/%d/%Y}",
         "tooltip": true,
         "format": "{:%H:%M}",
-        "actions":
-        {
+        "actions": {
             "on-click-right": "mode"
         },
-        "calendar":
-        {
+        "calendar": {
             "mode": "year",
             "mode-mon-col": 3,
-            "format":
-            {
+            "format": {
                 "months": "<span color='#ffead3'><b>{}</b></span>",
                 "days": "<span color='#ecc6d9'><b>{}</b></span>",
                 "weeks": "<span color='#99ffdd'><b>W{}</b></span>",
@@ -90,14 +91,11 @@
             }
         }
     },
-    "wireplumber":
-    {
+    "wireplumber": {
         "format": "{icon}",
         "format-muted": "",
-        "format-icons":
-        {
-            "default":
-            [
+        "format-icons": {
+            "default": [
                 "",
                 "",
                 " "

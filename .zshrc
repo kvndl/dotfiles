@@ -6,8 +6,6 @@ export PATH
 
 plugins=(git)
 
-. "$HOME/.cargo/env"
-
 export LANG="en_US.UTF-8"
 export TERM="xterm-256color"
 export EDITOR="nano"
@@ -15,6 +13,8 @@ export GPG_TTY=$TTY
 export GOPATH="$HOME/.go"
 export GOBIN="$HOME/.go/bin"
 export TENV_AUTO_INSTALL=true
+
+. "$HOME/.cargo/env"
 
 # zsh
 export ZSH="$HOME/.oh-my-zsh"
