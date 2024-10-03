@@ -1,0 +1,105 @@
+#!/bin/bash
+
+# scroll_workspace.sh
+# Script to scroll through workspaces on the monitor under the cursor
+
+# Enable strict error handling
+set -euo pipefail
+
+# Define monitor to workspaces mapping
+declare -A monitor_workspaces=(
+    ["HDMI-A-1"]="1 8"
+    ["DP-1"]="2 9"
+    ["DP-2"]="3 7"
+    ["DP-3"]="4 5 6"
+)
+
+# Define log file
+LOG_FILE="$HOME/.config/hypr/scroll_workspace.log"
+
+# Start logging (overwrite the log file each time)
+echo "----- $(date) -----" > "$LOG_FILE"
+
+# Get the cursor position
+cursor_pos=$(hyprctl -j cursorpos)
+if [ -z "$cursor_pos" ]; then
+    echo "Error: Could not retrieve cursor position." >> "$LOG_FILE"
+    exit 1
+fi
+
+cursor_x=$(echo "$cursor_pos" | jq '.x')
+cursor_y=$(echo "$cursor_pos" | jq '.y')
+
+echo "Cursor Position: x=$cursor_x, y=$cursor_y" >> "$LOG_FILE"
+
+# Find the monitor under the cursor
+monitor=$(hyprctl -j monitors | jq -r --argjson x "$cursor_x" --argjson y "$cursor_y" \
+    '.[] | select(.x <= $x and ($x < (.x + .width)) and .y <= $y and ($y < (.y + .height))) | .name')
+
+if [ -z "$monitor" ]; then
+    echo "Error: No monitor found under cursor." >> "$LOG_FILE"
+    exit 1
+fi
+
+echo "Monitor Under Cursor: $monitor" >> "$LOG_FILE"
+
+# Get the list of workspaces for the monitor
+workspaces_on_monitor=${monitor_workspaces["$monitor"]}
+
+if [ -z "$workspaces_on_monitor" ]; then
+    echo "Error: No workspaces defined for monitor $monitor." >> "$LOG_FILE"
+    exit 1
+fi
+
+echo "Workspaces on Monitor ($monitor): $workspaces_on_monitor" >> "$LOG_FILE"
+
+# Get the current active workspace ID on the monitor
+current_workspace=$(hyprctl -j monitors | jq -r --arg monitor "$monitor" \
+    '.[] | select(.name == $monitor) | .activeWorkspace.id')
+
+echo "Current Workspace on Monitor ($monitor): $current_workspace" >> "$LOG_FILE"
+
+# Convert the workspace list to an array
+read -ra workspace_array <<< "$workspaces_on_monitor"
+
+# Find the index of the current workspace in the array
+current_index=-1
+for i in "${!workspace_array[@]}"; do
+    if [[ "${workspace_array[$i]}" == "$current_workspace" ]]; then
+        current_index=$i
+        break
+    fi
+done
+
+# If current workspace not found, default to the first workspace
+if [ $current_index -eq -1 ]; then
+    current_index=0
+    echo "Warning: Current workspace ($current_workspace) not found in the list. Defaulting to first workspace." >> "$LOG_FILE"
+fi
+
+echo "Current Workspace Index: $current_index" >> "$LOG_FILE"
+
+# Determine the next workspace index based on direction
+if [ "$1" == "next" ]; then
+    next_index=$(( (current_index + 1) % ${#workspace_array[@]} ))
+    direction="next"
+elif [ "$1" == "prev" ]; then
+    next_index=$(( (current_index - 1 + ${#workspace_array[@]}) % ${#workspace_array[@]} ))
+    direction="prev"
+else
+    echo "Error: Invalid direction '$1'. Usage: $0 {next|prev}" >> "$LOG_FILE"
+    exit 1
+fi
+
+echo "Direction: $direction" >> "$LOG_FILE"
+echo "Next Workspace Index: $next_index" >> "$LOG_FILE"
+
+# Get the next workspace ID
+next_workspace="${workspace_array[$next_index]}"
+
+echo "Switching to Workspace: $next_workspace" >> "$LOG_FILE"
+
+# Switch to the calculated workspace
+hyprctl dispatch workspace "$next_workspace"
+
+echo "Successfully switched to Workspace: $next_workspace" >> "$LOG_FILE"

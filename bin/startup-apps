@@ -1,0 +1,95 @@
+#!/bin/bash
+
+# Path to the JSON configuration file
+CONFIG_FILE="$HOME/.config/hypr/startup-config.json"
+
+# Check if the configuration file exists
+if [ ! -f "$CONFIG_FILE" ]; then
+    echo "Error: Configuration file '$CONFIG_FILE' not found."
+    exit 1
+fi
+
+# Read the configuration
+apps=$(jq -c '.[]' "$CONFIG_FILE")
+
+# Function to move a window by PID to a workspace (same as before)
+move_window_by_pid() {
+    local pid="$1"
+    local workspace="$2"
+    local app_name="$3"
+
+    # Wait for the window to appear (max 60 seconds)
+    for i in {1..120}; do
+        window=$(hyprctl clients -j | jq -r ".[] | select(.pid == $pid) | .address")
+        if [ -n "$window" ]; then
+            break
+        fi
+        sleep 0.5
+    done
+
+    if [ -n "$window" ]; then
+        # Move window to the desired workspace
+        hyprctl dispatch movetoworkspace "$workspace" "$window"
+        echo "Moved '$app_name' to workspace $workspace"
+    else
+        echo "Failed to find window for PID $pid of '$app_name'"
+    fi
+}
+
+# Function to launch an application based on its type (same as before)
+launch_app() {
+    local app_name="$1"
+    local app_type="$2"
+    local launch_id="$3"
+    local workspace="$4"
+
+    echo "Launching '$app_name' on workspace $workspace..."
+
+    case "$app_type" in
+        "command")
+            # Launch using a shell command
+            eval "$launch_id" &
+            ;;
+        "desktop")
+            # Launch using gtk-launch
+            if command -v gtk-launch >/dev/null 2>&1; then
+                gtk-launch "$launch_id" &
+            else
+                echo "Error: gtk-launch not found. Cannot launch '$app_name'."
+                return
+            fi
+            ;;
+        "flatpak")
+            # Launch Flatpak application
+            if command -v flatpak >/dev/null 2>&1; then
+                flatpak run "$launch_id" &
+            else
+                echo "Error: Flatpak not found. Cannot launch '$app_name'."
+                return
+            fi
+            ;;
+        *)
+            echo "Error: Unknown application type '$app_type' for '$app_name'."
+            return
+            ;;
+    esac
+
+    pid=$!
+    move_window_by_pid "$pid" "$workspace" "$app_name"
+}
+
+# Main loop to launch applications
+while IFS= read -r app; do
+    app_name=$(echo "$app" | jq -r '.name')
+    app_type=$(echo "$app" | jq -r '.type')
+    launch_id=$(echo "$app" | jq -r '.launch_id')
+    workspace=$(echo "$app" | jq -r '.workspace')
+
+    # Validate required fields
+    if [[ -z "$app_name" || -z "$app_type" || -z "$launch_id" || -z "$workspace" ]]; then
+        echo "Error: Missing required fields in app configuration: $app"
+        continue
+    fi
+
+    launch_app "$app_name" "$app_type" "$launch_id" "$workspace"
+done <<< "$apps"
