@@ -26,10 +26,14 @@ path_append \
 # Other configs and exports
 export LANG="en_US.UTF-8"
 export TERM="xterm-256color"
-export EDITOR="nano"
 export DOTNET_ROOT="$HOME/dotnet"
 export GPG_TTY=$TTY
 export TENV_AUTO_INSTALL=true
+
+# Load (secret) environment variables
+if [ -f "$HOME/.env.secrets" ]; then
+    source "$HOME/.env.secrets"
+fi
 
 # Plugins
 plugins=(git)
