@@ -11,6 +11,7 @@ export MPV_CONF="$HOME/.config/mpv"
 export DOCKER_HOST='unix:///var/run/podman/podman.sock'
 export BUN_INSTALL="$HOME/.bun"
 export PNPM_HOME="$HOME/.pnpm"
+export GITHUB_USERNAME="kvndl"
 
 # -------------------------
 # Path Setup
