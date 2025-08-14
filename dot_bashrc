@@ -3,7 +3,7 @@
 
 export LANG="en_US.UTF-8"
 export TERM="kitty"
-export EDITOR="kate"
+export EDITOR="zed --wait"
 export TENV_AUTO_INSTALL=true
 export PODMAN_COMPOSE_WARNING_LOGS=false
 export POOL_DIR="/pool/king"
