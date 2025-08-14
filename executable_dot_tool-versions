@@ -1,0 +1,13 @@
+dotnet-core 8.0.403
+nodejs 22.11.0
+golang 1.23.3
+pulumi 3.153.1
+terraform 0.15.5
+terraform-docs 0.19.0
+pnpm 9.14.2
+github-cli 2.64.0
+python 3.11.11
+rust 1.85.0
+caddy 2.9.1
+awscli 2.24.14
+chezmoi 2.64.0
