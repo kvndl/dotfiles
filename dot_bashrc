@@ -1,0 +1,125 @@
+# ░██▄▒▄▀▄░▄▀▀░█▄█▒█▀▄░▄▀▀
+# ▒█▄█░█▀█▒▄██▒█▒█░█▀▄░▀▄▄
+
+export LANG="en_US.UTF-8"
+export TERM="kitty"
+export EDITOR="kate"
+export TENV_AUTO_INSTALL=true
+export PODMAN_COMPOSE_WARNING_LOGS=false
+export POOL_DIR="/pool/king"
+export MPV_CONF="$HOME/.config/mpv"
+export DOCKER_HOST='unix:///var/run/podman/podman.sock'
+export BUN_INSTALL="$HOME/.bun"
+export PNPM_HOME="$HOME/.pnpm"
+
+# -------------------------
+# Path Setup
+# -------------------------
+
+add_path_if_dir() {
+    [ -d "$1" ] || return
+    case ":$PATH:" in
+        *":$1:"*) ;;
+        *) PATH="$1:$PATH" ;;
+    esac
+}
+
+PATH="${PATH:-/usr/bin:/bin}"
+add_path_if_dir "/usr/local/bin"
+add_path_if_dir "/usr/NX/bin"
+#add_path_if_dir "$POOL_DIR/bin"
+add_path_if_dir "$HOME/bin"
+add_path_if_dir "$HOME/.local/bin"
+add_path_if_dir "$HOME/.dotnet/tools"
+add_path_if_dir "$HOME/.pulumi/bin"
+add_path_if_dir "$HOME/.cargo/bin"
+add_path_if_dir "$PNPM_HOME"
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+    . /etc/bashrc
+fi
+
+# User specific aliases and functions
+if [ -d ~/.bashrc.d ]; then
+    for rc in ~/.bashrc.d/*; do
+        if [ -f "$rc" ]; then
+            . "$rc"
+        fi
+    done
+fi
+unset rc
+
+# bun
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
+add_path_if_dir "$HOME/.bun/bin"
+
+# asdf
+if [ -f "$HOME/.tool-versions" ] || [ -d "${ASDF_DATA_DIR:-$HOME/.asdf}" ]; then
+    add_path_if_dir "${ASDF_DATA_DIR:-$HOME/.asdf}/shims"
+    # zsh-only completion init
+    if [ -n "$ZSH_VERSION" ]; then
+        fpath=(${ASDF_DATA_DIR:-$HOME/.asdf}/completions $fpath)
+        autoload -Uz compinit && compinit
+    fi
+fi
+
+# golang
+if command -v go >/dev/null 2>&1; then
+    GOPATH="$(go env GOPATH 2>/dev/null || printf '%s\n' "$HOME/go")"
+    add_path_if_dir "$GOPATH/bin"
+fi
+
+# nix
+if [ -f "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
+    . "$HOME/.nix-profile/etc/profile.d/nix.sh"
+fi
+
+# -------------------------
+# GPG / SSH agent
+# -------------------------
+if [ -d "$HOME/.gnupg" ] && command -v gpgconf >/dev/null 2>&1; then
+    if command -v tty >/dev/null 2>&1; then
+        export GPG_TTY="$(tty)"
+    fi
+    # if gpg-agent provides ssh socket
+    SSH_AGENT_SOCKET="$(gpgconf --list-dirs agent-ssh-socket 2>/dev/null || true)"
+    [ -n "$SSH_AGENT_SOCKET" ] && export SSH_AUTH_SOCK="$SSH_AGENT_SOCKET"
+fi
+
+# -------------------------
+# Environment files
+# -------------------------
+[ -f "$HOME/.env" ] && source "$HOME/.env"
+[ -f "$HOME/.env.secrets" ] && source "$HOME/.env.secrets"
+
+export PATH
+
+# -------------------------
+# Aliases
+# -------------------------
+alias c='clear'
+alias ..='cd ../'
+alias ...='cd ../../'
+alias ssh='TERM="xterm-256color" ssh'
+alias cdgh='cd ~/work'
+alias lg='lazygit'
+alias docker='podman'
+alias pc='podman compose'
+alias wake='wol 24:4b:fe:5c:fc:81'
+alias tl='tempo l'
+alias tls='tempo ls'
+alias td='tempo d'
+alias xwork='nxplayer $POOL_DIR/nx/MBP.nxs'
+alias xego='nxplayer $POOL_DIR/nx/Ego.nxs'
+alias gpgtest='echo "test" | gpg2 --clearsign'
+alias flushdns='sudo systemctl restart systemd-resolved'
+alias np='~/bin/now-playing'
+alias code='codium'
+
+alias mpva='mpv --scripts=$MPV_CONF/ytca/main.lua'
+alias jelly='mpv --idle=yes --scripts=$MPV_CONF/jellyfin/jellyfin.lua'
+
+alias tfp='terraform init && terraform plan -no-color > plan.txt'
+alias tfmt='terraform fmt'
+alias tfdoc='terraform-docs'
